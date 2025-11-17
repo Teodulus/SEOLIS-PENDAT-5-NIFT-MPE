@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": "../student_education_dataset.csv"
+      "includeFiles": "student_education_dataset.csv"
     }
   },
   "rewrites": [
