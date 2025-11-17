@@ -12,14 +12,13 @@ app = Flask(__name__)
 def handler(path):
     
     try:
-        # --- PERBAIKAN FINAL DI SINI ---
-        # Menggunakan os.getcwd() adalah cara paling stabil
+        # --- PATH INI SUDAH BENAR ---
         # Di Vercel, os.getcwd() akan mengarah ke /var/task
         base_dir = os.getcwd()
         
-        # Path ke CSV sekarang seharusnya sudah 100% benar
+        # Path ke CSV akan menjadi /var/task/student_education_dataset.csv
         csv_path = os.path.join(base_dir, 'student_education_dataset.csv')
-        # --- AKHIR PERBAIKAN FINAL ---
+        # --- AKHIR PATH ---
 
         if not os.path.exists(csv_path):
             # Pesan error yang lebih detail untuk debugging
