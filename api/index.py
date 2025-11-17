@@ -1,5 +1,5 @@
 # Simpan sebagai: api/index.py
-# (Dengan path yang sudah diperbaiki)
+# (Dengan path yang sudah FINAL dan BENAR)
 
 from flask import Flask, jsonify, request
 import pandas as pd
@@ -12,14 +12,18 @@ app = Flask(__name__)
 def handler(path):
     
     try:
-        # --- PERUBAHAN DI SINI ---
+        # --- PERBAIKAN FINAL DI SINI ---
         # Path ke file python ini (misal: /var/task/api/index.py)
         current_file_path = os.path.abspath(__file__)
         # Path ke folder tempat file ini berada (misal: /var/task/api)
         current_dir = os.path.dirname(current_file_path)
-        # Vercel menyalin CSV ke folder yang SAMA dengan file .py ini
-        csv_path = os.path.join(current_dir, 'student_education_dataset.csv')
-        # --- AKHIR PERUBAHAN ---
+        
+        # PERGI SATU LEVEL KE ATAS (ke /var/task)
+        parent_dir = os.path.dirname(current_dir)
+        
+        # Path ke CSV sekarang sudah benar
+        csv_path = os.path.join(parent_dir, 'student_education_dataset.csv')
+        # --- AKHIR PERBAIKAN FINAL ---
 
         if not os.path.exists(csv_path):
             # Pesan error jika masih tidak ditemukan
