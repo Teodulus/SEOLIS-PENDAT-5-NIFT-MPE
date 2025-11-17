@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Detail Siswa</title>
+    
+    <style>
+        :root {
+            --dark-green: #043915; --medium-green: #4c763b; --light-green: #b0ce88;
+            --light-yellow: #fefc8e; --white: #FFFFFF; --black: #000000;
+            --light-gray-bg: #f5f5f5;
+        }
+        body {
+            font-family: 'Arial', sans-serif; margin: 0; padding: 0;
+            background-color: var(--light-gray-bg); color: var(--black);
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+        header {
+            background-color: var(--dark-green); color: var(--white);
+            padding: 10px 20px; display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%; box-sizing: border-box;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-logo { height: 45px; width: auto; }
+        .header-title-group { display: flex; flex-direction: column; line-height: 1.2; }
+        .header-title-group h1 { margin: 0; font-size: 1.2em; font-weight: bold; }
+        .header-title-group p { margin: 0; font-size: 0.85em; color: rgba(255, 255, 255, 0.8); }
+        .header-right { font-size: 0.9em; color: rgba(255, 255, 255, 0.8); white-space: nowrap; }
+        main {
+            flex: 1; padding: 20px; width: 100%; box-sizing: border-box;
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+        .container {
+            max-width: 600px; margin: 0 auto; padding: 24px;
+            background-color: var(--white); border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        #studentIdInput {
+            padding: 12px; flex-grow: 1; border: 2px solid #ccc;
+            border-radius: 8px; font-size: 1em;
+        }
+        #searchButton {
+            background-color: var(--medium-green); color: var(--white);
+            padding: 12px 20px; font-size: 1em; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #searchButton:hover { background-color: var(--dark-green); }
+        #resultArea { margin-top: 20px; border-top: 2px solid var(--light-green); padding-top: 20px; }
+        .result-table { width: 100%; border-collapse: collapse; }
+        .result-table td { padding: 10px; border: 1px solid #ddd; }
+        .result-table td:first-child { font-weight: bold; background-color: #f9f9f9; width: 40%; }
+        .spinner {
+            border: 5px solid var(--light-green); border-top: 5px solid var(--medium-green);
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin: 30px auto; display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #statusMessage { text-align: center; font-size: 1.1rem; color: #777; padding: 20px; }
+        footer {
+            background-color: var(--dark-green); color: var(--white);
+            text-align: center; padding: 15px; font-size: 0.9em;
+            width: 100%; box-sizing: border-box; margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="SEOLIS.png" alt="SEOLIS Logo" class="header-logo">
+            <div class="header-title-group">
+                <h1>Acessan Global dan Aksesibilitas Pendidikan</h1>
+                <p>SEOLIS Education Learning System</p>
+            </div>
+        </div>
+        <div class="header-right">
+            Inovasi menuju dunia nyata
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h3>Masukkan ID Siswa</h3>
+            <div class="controls">
+                <input type="number" id="studentIdInput" placeholder="Contoh: 123">
+                <button id="searchButton">Cari</button>
+            </div>
+            <div id="loading" class="spinner"></div>
+            <div id="statusMessage"></div>
+            <div id="resultArea"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Seoludut Education Learning System</p>
+    </footer>
+
+    <script>
+        // 1. Ambil elemen HTML yang kita butuhkan
+        const searchButton = document.getElementById('searchButton');
+        const studentIdInput = document.getElementById('studentIdInput');
+        const loadingSpinner = document.getElementById('loading');
+        const statusMessage = document.getElementById('statusMessage');
+        const resultArea = document.getElementById('resultArea');
+
+        // 2. Saat tombol "Cari" diklik
+        searchButton.onclick = async function() {
+            const studentId = studentIdInput.value;
+
+            if (!studentId) {
+                statusMessage.innerText = 'Silakan masukkan Student ID.';
+                return;
+            }
+            
+            // Persiapan UI: Tampilkan loading, sembunyikan hasil lama
+            loadingSpinner.style.display = 'block';
+            statusMessage.innerText = '';
+            resultArea.innerHTML = '';
+            searchButton.disabled = true;
+
+            try {
+                // 3. INI KONEKSINYA: "Telepon" ke backend Python
+                // Alamat /api/students akan otomatis diarahkan Vercel ke file api/students.py
+                // Kita tambahkan ?id=... untuk mengirim ID yang diinput
+                const response = await fetch(`/api/students?id=${studentId}`);
+                
+                // Ambil jawaban dari Python
+                const data = await response.json();
+
+                // Cek jika Python mengirim error
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || `Status: ${response.status}`);
+                }
+
+                // 4. Jika berhasil, tampilkan datanya
+                displayStudentDetails(data);
+
+            } catch (error) {
+                // Jika "telepon" gagal atau Python kirim error
+                console.error('Error:', error);
+                statusMessage.innerText = `Gagal mengambil data: ${error.message}`;
+            } finally {
+                // 5. Apapun hasilnya, sembunyikan loading
+                loadingSpinner.style.display = 'none';
+                searchButton.disabled = false;
+            }
+        };
+
+        // Fungsi untuk membangun tabel HTML dari data JSON
+        function displayStudentDetails(data) {
+            resultArea.innerHTML = `
+                <h2>Detail untuk Siswa ID: ${data.StudentID}</h2>
+                <table class="result-table">
+                    <tr><td>StudentID</td><td>${data.StudentID}</td></tr>
+                    <tr><td>Skor Akademik</td><td>${data.AcademicScore}</td></tr>
+                    <tr><td>Partisipasi (CourseParticipation)</td><td>${data.CourseParticipation}</td></tr>
+                    <tr><td>Keterlibatan Emosional (EmotionEngagement)</td><td>${data.EmotionEngagement}</td></tr>
+                    <tr><td>Gaya Belajar (LearningStyle)</td><td>${data.LearningStyle}</td></tr>
+                    <tr><td>Tingkat Kehadiran</td><td>${data.AttendanceRate.toFixed(2)}</td></tr>
+                    <tr><td>Performa Siswa</td><td>${data.StudentPerformance}</td></tr>
+                </table>
+            `;
+        }
+    </script>
+
+</body>
+</html>
