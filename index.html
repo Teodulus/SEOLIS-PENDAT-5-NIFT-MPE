@@ -118,9 +118,7 @@
             searchButton.disabled = true;
 
             try {
-                // --- INI DIA PERUBAHANNYA ---
-                // LAMA: /api/students?id=${studentId}
-                // BARU: /api?id=${studentId}
+                // Path ini sudah benar
                 const response = await fetch(`/api?id=${studentId}`);
                 
                 const data = await response.json();
