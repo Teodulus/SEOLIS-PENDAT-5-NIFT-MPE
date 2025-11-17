@@ -13,21 +13,23 @@ def handler(path):
     
     try:
         # --- PERBAIKAN FINAL DI SINI ---
+        # KITA KEMBALIKAN KE VERSI ASLI (YANG SUDAH BENAR)
+        
         # Path ke file python ini (misal: /var/task/api/index.py)
         current_file_path = os.path.abspath(__file__)
         # Path ke folder tempat file ini berada (misal: /var/task/api)
         current_dir = os.path.dirname(current_file_path)
         
-        # KITA HAPUS "parent_dir" KARENA TIDAK DIPERLUKAN LAGI
+        # PERGI SATU LEVEL KE ATAS (ke /var/task)
+        parent_dir = os.path.dirname(current_dir)
         
         # Path ke CSV sekarang sudah benar
-        # File CSV ada di direktori yang SAMA (current_dir) dengan file index.py ini
-        csv_path = os.path.join(current_dir, 'student_education_dataset.csv')
+        csv_path = os.path.join(parent_dir, 'student_education_dataset.csv')
         # --- AKHIR PERBAIKAN FINAL ---
 
         if not os.path.exists(csv_path):
             # Pesan error jika masih tidak ditemukan
-            return jsonify({"error": f"File CSV tidak ditemukan di path: {csv_path}"}), 404
+            return jsonify({"error": f"File CSV tidak ditemukan di path: {csv_path}. Path file script: {current_file_path}"}), 404
         
         df = pd.read_csv(csv_path)
 
@@ -55,5 +57,5 @@ def handler(path):
             return jsonify(data)
 
     except Exception as e:
-        # Jika ada error lain, kirim sebagai JSON agar mudah di-debug
+        # Mengirim error sebagai JSON agar mudah di-debug
         return jsonify({"error": f"Terjadi kesalahan pada server: {str(e)}"}), 500
