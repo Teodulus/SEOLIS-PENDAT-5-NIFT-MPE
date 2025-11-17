@@ -1,5 +1,5 @@
 # Simpan sebagai: api/index.py
-# (Dengan path yang sudah FINAL dan BENAR)
+# (Versi FINAL dengan path os.getcwd())
 
 from flask import Flask, jsonify, request
 import pandas as pd
@@ -13,23 +13,21 @@ def handler(path):
     
     try:
         # --- PERBAIKAN FINAL DI SINI ---
-        # KITA KEMBALIKAN KE VERSI ASLI (YANG SUDAH BENAR)
+        # Menggunakan os.getcwd() adalah cara paling stabil
+        # Di Vercel, os.getcwd() akan mengarah ke /var/task
+        base_dir = os.getcwd()
         
-        # Path ke file python ini (misal: /var/task/api/index.py)
-        current_file_path = os.path.abspath(__file__)
-        # Path ke folder tempat file ini berada (misal: /var/task/api)
-        current_dir = os.path.dirname(current_file_path)
-        
-        # PERGI SATU LEVEL KE ATAS (ke /var/task)
-        parent_dir = os.path.dirname(current_dir)
-        
-        # Path ke CSV sekarang sudah benar
-        csv_path = os.path.join(parent_dir, 'student_education_dataset.csv')
+        # Path ke CSV sekarang seharusnya sudah 100% benar
+        csv_path = os.path.join(base_dir, 'student_education_dataset.csv')
         # --- AKHIR PERBAIKAN FINAL ---
 
         if not os.path.exists(csv_path):
-            # Pesan error jika masih tidak ditemukan
-            return jsonify({"error": f"File CSV tidak ditemukan di path: {csv_path}. Path file script: {current_file_path}"}), 404
+            # Pesan error yang lebih detail untuk debugging
+            return jsonify({
+                "error": "File CSV tidak ditemukan.",
+                "cek_path_ini": csv_path,
+                "base_dir": base_dir
+            }), 404
         
         df = pd.read_csv(csv_path)
 
