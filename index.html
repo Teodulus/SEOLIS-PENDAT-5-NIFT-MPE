@@ -100,57 +100,43 @@
     </footer>
 
     <script>
-        // 1. Ambil elemen HTML yang kita butuhkan
         const searchButton = document.getElementById('searchButton');
         const studentIdInput = document.getElementById('studentIdInput');
         const loadingSpinner = document.getElementById('loading');
         const statusMessage = document.getElementById('statusMessage');
         const resultArea = document.getElementById('resultArea');
 
-        // 2. Saat tombol "Cari" diklik
         searchButton.onclick = async function() {
             const studentId = studentIdInput.value;
-
             if (!studentId) {
                 statusMessage.innerText = 'Silakan masukkan Student ID.';
                 return;
             }
-            
-            // Persiapan UI: Tampilkan loading, sembunyikan hasil lama
             loadingSpinner.style.display = 'block';
             statusMessage.innerText = '';
             resultArea.innerHTML = '';
             searchButton.disabled = true;
 
             try {
-                // 3. INI KONEKSINYA: "Telepon" ke backend Python
-                // Alamat /api/students akan otomatis diarahkan Vercel ke file api/students.py
-                // Kita tambahkan ?id=... untuk mengirim ID yang diinput
-                const response = await fetch(`/api/students?id=${studentId}`);
+                // --- INI DIA PERUBAHANNYA ---
+                // LAMA: /api/students?id=${studentId}
+                // BARU: /api?id=${studentId}
+                const response = await fetch(`/api?id=${studentId}`);
                 
-                // Ambil jawaban dari Python
                 const data = await response.json();
-
-                // Cek jika Python mengirim error
                 if (!response.ok || data.error) {
                     throw new Error(data.error || `Status: ${response.status}`);
                 }
-
-                // 4. Jika berhasil, tampilkan datanya
                 displayStudentDetails(data);
-
             } catch (error) {
-                // Jika "telepon" gagal atau Python kirim error
                 console.error('Error:', error);
                 statusMessage.innerText = `Gagal mengambil data: ${error.message}`;
             } finally {
-                // 5. Apapun hasilnya, sembunyikan loading
                 loadingSpinner.style.display = 'none';
                 searchButton.disabled = false;
             }
         };
 
-        // Fungsi untuk membangun tabel HTML dari data JSON
         function displayStudentDetails(data) {
             resultArea.innerHTML = `
                 <h2>Detail untuk Siswa ID: ${data.StudentID}</h2>
