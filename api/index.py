@@ -1,5 +1,6 @@
 # Simpan sebagai: api/index.py
 # (Versi FINAL dengan path os.getcwd())
+# KODE INI SUDAH BENAR, JANGAN DIUBAH
 
 from flask import Flask, jsonify, request
 import pandas as pd
@@ -17,6 +18,7 @@ def handler(path):
         base_dir = os.getcwd()
         
         # Path ke CSV akan menjadi /var/task/student_education_dataset.csv
+        # (Karena vercel.json akan menyalinnya ke sana)
         csv_path = os.path.join(base_dir, 'student_education_dataset.csv')
         # --- AKHIR PATH ---
 
